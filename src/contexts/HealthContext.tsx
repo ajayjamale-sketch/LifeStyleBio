@@ -1,7 +1,11 @@
 import React, { createContext, useState, useCallback } from 'react';
 import type { HealthProfile, MedicalRecord, NutritionLog, FitnessLog, SleepLog, MoodLog, VitalSigns } from '@/types/health.types';
-import { STORAGE_KEYS } from '@/constants/appConstants';
 import { generateId } from '@/utils/helpers';
+
+const STORAGE_KEYS = {
+  HEALTH_DATA: 'health_data',
+  MEDICAL_RECORDS: 'medical_records',
+} as const;
 
 interface HealthContextType {
   healthProfile: HealthProfile | null;

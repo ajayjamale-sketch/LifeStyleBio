@@ -88,8 +88,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const allUsers: User[] = JSON.parse(localStorage.getItem(STORAGE_KEYS.ALL_USERS) || '[]');
     const adminUser = allUsers.find(
       u => u.email.toLowerCase() === credentials.email.toLowerCase() &&
-           u.password === credentials.password &&
-           u.role === 'admin'
+        u.password === credentials.password &&
+        u.role === 'admin'
     );
 
     if (!adminUser) {
