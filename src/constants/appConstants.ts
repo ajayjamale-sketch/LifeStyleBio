@@ -2,6 +2,8 @@ export const STORAGE_KEYS = {
   THEME: 'lifestylebio_theme',
   AUTH_TOKEN: 'lifestylebio_auth_token',
   USER_DATA: 'lifestylebio_user',
+  CURRENT_USER: 'lifestylebio_current_user',
+  ALL_USERS: 'lifestylebio_all_users',
   HEALTH_DATA: 'lifestylebio_health_data',
   MEDICAL_RECORDS: 'lifestylebio_medical_records',
 } as const;
@@ -24,5 +26,6 @@ export const SOCIAL_LINKS = {
 } as const;
 
 export const APP_NAME = 'LifestyleBio';
-export const APP_LOGO_URL = 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=100&h=100&fit=crop';
+export const APP_LOGO_URL = '/logo.svg';
+export const APP_LOGO_ICON_URL = '/logo-icon.svg';
 export const APP_DESCRIPTION = 'AI-powered personalized health platform';

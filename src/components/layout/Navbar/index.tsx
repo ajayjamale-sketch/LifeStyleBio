@@ -38,7 +38,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to={ROUTES.HOME} className="flex-shrink-0">
-            <img src={APP_LOGO_URL} alt="LifestyleBio" className="h-10 w-auto" />
+            <img src={APP_LOGO_URL} alt="LifestyleBio" className="h-10 sm:h-12 w-auto object-contain" />
           </Link>
 
           {/* Desktop Nav */}
