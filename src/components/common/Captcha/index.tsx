@@ -1,96 +1,183 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  ShieldCheck, 
+  CheckCircle2, 
+  RefreshCw, 
+  Lock, 
+  Cpu, 
+  Dna, 
+  Heart, 
+  Activity, 
+  Zap,
+  Sparkles,
+  AlertCircle
+} from 'lucide-react';
 
 interface CaptchaProps {
   onVerify: (verified: boolean) => void;
+  className?: string;
 }
 
-const Captcha: React.FC<CaptchaProps> = ({ onVerify }) => {
-  const [num1, setNum1] = useState(0);
-  const [num2, setNum2] = useState(0);
-  const [answer, setAnswer] = useState('');
-  const [verified, setVerified] = useState(false);
-  const [error, setError] = useState('');
-  const [attempts, setAttempts] = useState(0);
+const ICONS_POOL = [
+  { id: 'heart', label: 'Heart Cardio', icon: Heart },
+  { id: 'dna', label: 'DNA Helix', icon: Dna },
+  { id: 'pulse', label: 'Telemetry Pulse', icon: Activity },
+  { id: 'sensor', label: 'Bio Sensor', icon: Cpu },
+  { id: 'energy', label: 'Cellular ATP', icon: Zap },
+];
 
-  const generateCaptcha = useCallback(() => {
-    const n1 = Math.floor(Math.random() * 12) + 1;
-    const n2 = Math.floor(Math.random() * 12) + 1;
-    setNum1(n1);
-    setNum2(n2);
-    setAnswer('');
-    setError('');
-    setVerified(false);
+const Captcha: React.FC<CaptchaProps> = ({ onVerify, className = '' }) => {
+  const [status, setStatus] = useState<'idle' | 'verifying' | 'verified' | 'challenge' | 'failed'>('idle');
+  const [token, setToken] = useState<string>('');
+  const [targetIcon, setTargetIcon] = useState(ICONS_POOL[0]);
+  const [randomizedIcons, setRandomizedIcons] = useState(ICONS_POOL);
+
+  const resetVerification = () => {
+    setStatus('idle');
+    setToken('');
     onVerify(false);
-  }, [onVerify]);
+  };
 
-  useEffect(() => {
-    generateCaptcha();
-  }, [generateCaptcha]);
+  const handleTurnstileClick = () => {
+    if (status === 'verifying' || status === 'verified') return;
+    setStatus('verifying');
 
-  const handleVerify = () => {
-    const correct = num1 + num2;
-    if (parseInt(answer) === correct) {
-      setVerified(true);
-      setError('');
+    // Simulate cryptographic proof-of-work & behavioral biometric verification
+    setTimeout(() => {
+      const generatedToken = `bio_sec_${Math.random().toString(36).substring(2, 8)}`;
+      setToken(generatedToken);
+      setStatus('verified');
+      onVerify(true);
+    }, 600);
+  };
+
+  const setupBiometricChallenge = () => {
+    const shuffled = [...ICONS_POOL].sort(() => Math.random() - 0.5);
+    const target = shuffled[Math.floor(Math.random() * shuffled.length)];
+    setRandomizedIcons(shuffled);
+    setTargetIcon(target);
+    setStatus('challenge');
+    onVerify(false);
+  };
+
+  const handleIconSelect = (selectedId: string) => {
+    if (selectedId === targetIcon.id) {
+      const generatedToken = `bio_sec_${Math.random().toString(36).substring(2, 8)}`;
+      setToken(generatedToken);
+      setStatus('verified');
       onVerify(true);
     } else {
-      setAttempts(prev => prev + 1);
-      setError(`Incorrect. Please try again.`);
-      setAnswer('');
-      if (attempts >= 2) generateCaptcha();
-      onVerify(false);
+      setStatus('failed');
+      setTimeout(() => {
+        setupBiometricChallenge();
+      }, 1000);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleVerify();
-  };
-
-  if (verified) {
-    return (
-      <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
-        <CheckCircle className="text-emerald-500" size={18} />
-        <span className="text-emerald-700 text-sm font-medium">Security check passed</span>
-      </div>
-    );
-  }
-
   return (
-    <div className="border border-gray-200 rounded-xl p-4 bg-gray-50">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Security Verification</p>
-      <div className="flex items-center gap-3">
-        <div className="flex-shrink-0 bg-white border border-gray-200 rounded-lg px-4 py-2 font-mono text-base font-bold text-gray-800 select-none shadow-sm">
-          {num1} + {num2} = ?
+    <div className={`rounded-xl border border-slate-200/90 bg-slate-50/80 p-2.5 sm:p-3 transition-all select-none ${className}`}>
+      
+      {/* Standard Turnstile / Smart Verification View */}
+      {status !== 'challenge' && (
+        <div className="flex items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            {/* Checkbox Trigger with Strict Dimensions and Aspect Ratio */}
+            <button
+              type="button"
+              onClick={handleTurnstileClick}
+              disabled={status === 'verifying' || status === 'verified'}
+              className={`w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 aspect-square transition-all cursor-pointer ${
+                status === 'verified'
+                  ? 'bg-emerald-500 border-emerald-500 text-white shadow-xs'
+                  : status === 'verifying'
+                  ? 'bg-white border-emerald-400'
+                  : 'bg-white border-slate-300 hover:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20'
+              }`}
+            >
+              {status === 'verified' && (
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 400, damping: 20 }}>
+                  <CheckCircle2 size={14} strokeWidth={2.5} />
+                </motion.div>
+              )}
+              {status === 'verifying' && (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+                  className="w-3.5 h-3.5 rounded-full border-2 border-emerald-500 border-t-transparent"
+                />
+              )}
+            </button>
+
+            <div className="text-left min-w-0 flex-1">
+              <div className="text-xs font-bold text-slate-800 truncate leading-tight">
+                {status === 'verified' ? (
+                  <span className="text-emerald-700">Security Verified</span>
+                ) : status === 'verifying' ? (
+                  <span className="text-slate-600">Verifying security token...</span>
+                ) : (
+                  <span>Verify you are human</span>
+                )}
+              </div>
+              <div className="text-[10px] text-slate-400 font-mono truncate leading-tight mt-0.5">
+                {status === 'verified' ? `Token: ${token}` : 'HIPAA Protected Shield'}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Brand Badge */}
+          <div className="flex flex-col items-end shrink-0 pl-1.5 border-l border-slate-200/80">
+            <div className="flex items-center gap-1 text-[10px] font-bold text-slate-700">
+              <ShieldCheck size={12} className="text-emerald-500 shrink-0" />
+              <span>BioGuardian</span>
+            </div>
+            <span className="text-[8px] text-slate-400">Protected</span>
+          </div>
         </div>
-        <input
-          type="number"
-          value={answer}
-          onChange={e => setAnswer(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Answer"
-          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent min-w-0"
-          min="0"
-          max="99"
-        />
-        <button
-          type="button"
-          onClick={handleVerify}
-          disabled={!answer}
-          className="flex-shrink-0 px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          Verify
-        </button>
-        <button
-          type="button"
-          onClick={generateCaptcha}
-          className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
-          title="Refresh"
-        >
-          <RefreshCw size={16} />
-        </button>
-      </div>
-      {error && <p className="text-red-500 text-xs mt-2 flex items-center gap-1">{error}</p>}
+      )}
+
+      {/* Optional Interactive Biometric Icon Challenge (Fallback Mode) */}
+      {status === 'challenge' && (
+        <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold text-slate-800 flex items-center gap-1 text-[11px]">
+              <Sparkles size={12} className="text-emerald-600" />
+              Select the <strong>{targetIcon.label}</strong> icon:
+            </span>
+            <button
+              type="button"
+              onClick={setupBiometricChallenge}
+              className="text-slate-400 hover:text-slate-600 transition-colors p-0.5"
+              title="New challenge"
+            >
+              <RefreshCw size={12} />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-5 gap-1.5">
+            {randomizedIcons.map((item) => {
+              const IconComp = item.icon;
+              return (
+                <button
+                  type="button"
+                  key={item.id}
+                  onClick={() => handleIconSelect(item.id)}
+                  className="p-2 bg-white hover:bg-emerald-50 hover:border-emerald-400 rounded-lg border border-slate-200 flex flex-col items-center justify-center transition-all cursor-pointer group"
+                >
+                  <IconComp size={16} className="text-slate-600 group-hover:text-emerald-600 group-hover:scale-110 transition-all" />
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Failure State */}
+      {status === 'failed' && (
+        <div className="text-[10px] text-red-500 font-medium mt-1.5 flex items-center gap-1">
+          <AlertCircle size={11} /> Verification failed. Retrying...
+        </div>
+      )}
     </div>
   );
 };

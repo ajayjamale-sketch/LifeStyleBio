@@ -3,9 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Settings, LogOut, ChevronDown, Globe } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { getInitials, getAvatarUrl, getRoleDashboard } from '@/utils/helpers';
+import { getInitials, getAvatarUrl } from '@/utils/helpers';
 import { ROLE_LABELS } from '@/constants/roles';
-import { ROUTES } from '@/constants/routes';
+import { ROUTES, getRoleDashboard } from '@/constants/routes';
 
 const getProfilePath = (role: string) => {
   const paths: Record<string, string> = {

@@ -149,11 +149,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    if (!sessionUser) {
-      sessionUser = DEFAULT_DEMO_USER;
-      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(DEFAULT_DEMO_USER));
-    }
-
     setUser(sessionUser);
     setIsLoading(false);
   }, []);
@@ -184,7 +179,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem(STORAGE_KEYS.ALL_USERS, JSON.stringify(updatedUsers));
     localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(updatedUser));
     setUser(updatedUser);
-    toast.success(`Welcome back, ${foundUser.firstName}! 🌿`);
+    toast.success(`Welcome back, ${foundUser.firstName}!`);
     return true;
   }, []);
 

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Menu, Bell, Search } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import ProfileDropdown from '../ProfileDropdown';
+import NotificationDropdown from '../NotificationDropdown';
 
 interface DashboardHeaderProps {
   onMenuClick: () => void;
@@ -71,10 +72,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <button className="relative p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors">
-          <Bell size={20} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full border border-white" />
-        </button>
+        <NotificationDropdown />
         <ProfileDropdown />
       </div>
     </header>

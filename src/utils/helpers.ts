@@ -127,3 +127,17 @@ export const clampNumber = (value: number, min: number, max: number): number => 
 export const randomBetween = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+export const getRoleDashboard = (role: string): string => {
+  const routes: Record<string, string> = {
+    individual_user: '/dashboard',
+    nutritionist: '/nutritionist/dashboard',
+    fitness_coach: '/fitness-coach/dashboard',
+    healthcare_professional: '/healthcare/dashboard',
+    corporate_wellness_manager: '/corporate/dashboard',
+    family_member: '/family/dashboard',
+    admin: '/admin/dashboard',
+  };
+  return routes[role] || '/dashboard';
+};
+
