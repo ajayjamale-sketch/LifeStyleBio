@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ShieldCheck } from 'lucide-react';
-import { APP_LOGO_URL, SOCIAL_LINKS } from '@/constants/appConstants';
+import { SOCIAL_LINKS } from '@/constants/appConstants';
 import { ROUTES } from '@/constants/routes';
 import { XIcon, LinkedInIcon, FacebookIcon } from '@/components/common/SocialIcons';
+import { BrandLogo } from '@/components/common/BrandLogo';
 
 const Footer: React.FC = () => {
   const year = new Date().getFullYear();
@@ -47,7 +48,7 @@ const Footer: React.FC = () => {
           <div className="col-span-2 lg:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <Link to={ROUTES.HOME} className="inline-block">
-                <img src={APP_LOGO_URL} alt="LifestyleBio" className="h-9 sm:h-10 w-auto brightness-0 invert" />
+                <BrandLogo variant="dark" className="h-9 sm:h-10 w-auto" />
               </Link>
             </div>
             <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-6 max-w-sm">

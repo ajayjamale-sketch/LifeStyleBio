@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { FileText, UploadCloud, Search, Trash2, Download, Plus, Calendar, Tag, Shield } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { FileText, UploadCloud, Search, Trash2, Download, Plus, Calendar, Tag, Shield, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Modal } from '@/components/common/Modal';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 interface MedicalRecordItem {
   id: string;
@@ -12,17 +14,34 @@ interface MedicalRecordItem {
   fileSize: string;
 }
 
+const MEDICAL_RECORDS_KEY = 'lifestylebio_member_medical_records';
+
+const DEFAULT_RECORDS: MedicalRecordItem[] = [
+  { id: 'rec_1', title: 'Annual Blood Panel Results', category: 'Lab Report', date: '2026-06-15', provider: 'Quest Diagnostics', fileName: 'blood_report_2026.pdf', fileSize: '2.4 MB' },
+  { id: 'rec_2', title: 'Allergy Medication Prescription', category: 'Prescription', date: '2026-05-10', provider: 'Dr. Sarah Taylor', fileName: 'rx_allergy_may26.pdf', fileSize: '850 KB' },
+  { id: 'rec_3', title: 'Covid-19 Booster Card', category: 'Vaccine Card', date: '2025-11-20', provider: 'Walgreens Pharmacy', fileName: 'vaccine_booster.jpg', fileSize: '1.2 MB' },
+];
+
 const MedicalRecords: React.FC = () => {
-  const [records, setRecords] = useState<MedicalRecordItem[]>([
-    { id: 'rec_1', title: 'Annual Blood Panel Results', category: 'Lab Report', date: '2026-06-15', provider: 'Quest Diagnostics', fileName: 'blood_report_2026.pdf', fileSize: '2.4 MB' },
-    { id: 'rec_2', title: 'Allergy Medication Prescription', category: 'Prescription', date: '2026-05-10', provider: 'Dr. Sarah Taylor', fileName: 'rx_allergy_may26.pdf', fileSize: '850 KB' },
-    { id: 'rec_3', title: 'Covid-19 Booster Card', category: 'Vaccine Card', date: '2025-11-20', provider: 'Walgreens Pharmacy', fileName: 'vaccine_booster.jpg', fileSize: '1.2 MB' },
-  ]);
+  const [records, setRecords] = useState<MedicalRecordItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(MEDICAL_RECORDS_KEY);
+      return saved ? JSON.parse(saved) : DEFAULT_RECORDS;
+    } catch {
+      return DEFAULT_RECORDS;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(MEDICAL_RECORDS_KEY, JSON.stringify(records));
+  }, [records]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [isUploading, setIsUploading] = useState(false);
-  const [newRecord, setNewRecord] = useState({ title: '', category: 'Lab Report' as const, provider: '', fileName: '' });
+  const [newRecord, setNewRecord] = useState({ title: '', category: 'Lab Report' as MedicalRecordItem['category'], provider: '', fileName: '' });
+  const [editingRecord, setEditingRecord] = useState<MedicalRecordItem | null>(null);
+  const [deletingRecord, setDeletingRecord] = useState<MedicalRecordItem | null>(null);
 
   const filteredRecords = records.filter(rec => {
     const matchesSearch = rec.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -32,9 +51,22 @@ const MedicalRecords: React.FC = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const handleDelete = (id: string) => {
-    setRecords(prev => prev.filter(rec => rec.id !== id));
+  const handleConfirmDelete = () => {
+    if (!deletingRecord) return;
+    setRecords(prev => prev.filter(rec => rec.id !== deletingRecord.id));
     toast.success('Medical record removed successfully.');
+    setDeletingRecord(null);
+  };
+
+  const handleUpdateRecord = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRecord || !editingRecord.title.trim() || !editingRecord.provider.trim()) {
+      toast.error('Title and provider are required.');
+      return;
+    }
+    setRecords(prev => prev.map(r => (r.id === editingRecord.id ? editingRecord : r)));
+    toast.success('Medical record updated successfully.');
+    setEditingRecord(null);
   };
 
   const handleUpload = (e: React.FormEvent) => {
@@ -59,7 +91,7 @@ const MedicalRecords: React.FC = () => {
       setNewRecord({ title: '', category: 'Lab Report', provider: '', fileName: '' });
       setIsUploading(false);
       toast.success('Medical record uploaded and encrypted.');
-    }, 1500);
+    }, 600);
   };
 
   return (
@@ -221,7 +253,14 @@ const MedicalRecords: React.FC = () => {
                       <Download size={16} />
                     </button>
                     <button
-                      onClick={() => handleDelete(rec.id)}
+                      onClick={() => setEditingRecord(rec)}
+                      className="p-2 hover:bg-emerald-50 rounded-xl text-gray-400 hover:text-emerald-600 transition-colors"
+                      title="Edit Record"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button
+                      onClick={() => setDeletingRecord(rec)}
                       className="p-2 hover:bg-red-50 rounded-xl text-gray-400 hover:text-red-600 transition-colors"
                       title="Delete"
                     >
@@ -240,6 +279,82 @@ const MedicalRecords: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Edit Medical Record Modal */}
+      <Modal
+        isOpen={!!editingRecord}
+        onClose={() => setEditingRecord(null)}
+        title="Edit Medical Record"
+        size="md"
+      >
+        {editingRecord && (
+          <form onSubmit={handleUpdateRecord} className="space-y-4">
+            <div>
+              <label className="label">Document Title *</label>
+              <input
+                type="text"
+                required
+                value={editingRecord.title}
+                onChange={e => setEditingRecord({ ...editingRecord, title: e.target.value })}
+                className="input-field"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="label">Category</label>
+                <select
+                  value={editingRecord.category}
+                  onChange={e => setEditingRecord({ ...editingRecord, category: e.target.value as MedicalRecordItem['category'] })}
+                  className="input-field"
+                >
+                  <option value="Lab Report">Lab Report</option>
+                  <option value="Prescription">Prescription</option>
+                  <option value="Vaccine Card">Vaccine Card</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="label">Date</label>
+                <input
+                  type="date"
+                  value={editingRecord.date}
+                  onChange={e => setEditingRecord({ ...editingRecord, date: e.target.value })}
+                  className="input-field"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="label">Provider *</label>
+              <input
+                type="text"
+                required
+                value={editingRecord.provider}
+                onChange={e => setEditingRecord({ ...editingRecord, provider: e.target.value })}
+                className="input-field"
+              />
+            </div>
+            <div className="flex justify-end gap-3 pt-2">
+              <button type="button" onClick={() => setEditingRecord(null)} className="btn-outline text-sm">
+                Cancel
+              </button>
+              <button type="submit" className="btn-primary text-sm">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        )}
+      </Modal>
+
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        isOpen={!!deletingRecord}
+        onClose={() => setDeletingRecord(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Medical Record"
+        message={`Are you sure you want to permanently remove "${deletingRecord?.title}" from your vault?`}
+        confirmText="Delete Record"
+        variant="danger"
+      />
     </div>
   );
 };

@@ -49,33 +49,6 @@ const missionPillars = [
   },
 ];
 
-const advisoryBoard = [
-  {
-    name: 'Dr. Christopher Chen, MD',
-    role: 'Chief Medical Officer • Longevity Medicine',
-    credentials: 'Harvard Medical School • 18+ Yrs Clinical Experience',
-    bio: 'Pioneer in cardiovascular longevity and preventive biomarker analytics. Dr. Chen oversees LifestyleBio’s clinical risk algorithms and diagnostic safety guardrails.',
-    image: '/images/about/advisor_chen.jpg',
-    specialties: ['Cardiovascular Biomarkers', 'ApoB Optimization', 'Longevity Protocols'],
-  },
-  {
-    name: 'Dr. Amara Patel, PhD',
-    role: 'VP of AI & Health Intelligence',
-    credentials: 'Stanford University Bio-X • Computational Biology',
-    bio: 'Leading researcher in multi-modal health machine learning and retrieval-augmented biomarker synthesis. Architect of LifestyleBio’s 24×7 Contextual AI Coach.',
-    image: '/images/about/advisor_amara.jpg',
-    specialties: ['Contextual RAG Models', 'Telemetry Ingestion', 'Predictive Analytics'],
-  },
-  {
-    name: 'Dr. Julian Weiss, MD, PhD',
-    role: 'Director of Epigenetics & Longevity',
-    credentials: 'Mayo Clinic Fellow • University of Copenhagen',
-    bio: 'Specialist in biological age clocks, cellular senescence, and mitochondrial biogenesis. Drives LifestyleBio’s longitudinal healthspan forecasting engine.',
-    image: '/images/about/advisor_weiss.jpg',
-    specialties: ['Biological Age Clocks', 'Mitochondrial Health', 'Metabolic Fitness'],
-  },
-];
-
 const paradigmComparison = [
   {
     dimension: 'Approach',
@@ -297,68 +270,8 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      {/* Clinical & Scientific Advisory Board */}
-      <section className="py-24 bg-gray-50/80 border-t border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-50 border border-violet-100 text-violet-800 text-xs font-semibold mb-4">
-              <Award size={14} className="text-violet-500" />
-              <span>Scientific Advisory Board</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight font-heading">
-              Guided by Leaders in <span className="gradient-text">Medicine & AI</span>
-            </h2>
-            <p className="mt-4 text-base sm:text-lg text-gray-600 leading-relaxed">
-              Our clinical algorithms, risk models, and safety boundaries are directed by world-renowned longevity physicians, AI researchers, and computational biologists.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
-            {advisoryBoard.map((advisor, idx) => (
-              <motion.div
-                key={advisor.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-white rounded-3xl p-7 border border-gray-100 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="relative mb-5 overflow-hidden rounded-2xl bg-gray-100 aspect-square">
-                    <img
-                      src={advisor.image}
-                      alt={advisor.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <h3 className="font-bold text-lg text-gray-900 leading-snug">{advisor.name}</h3>
-                  <div className="text-xs font-bold text-emerald-600 mt-1">{advisor.role}</div>
-                  <div className="text-[11px] text-gray-400 mt-0.5">{advisor.credentials}</div>
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mt-3">
-                    {advisor.bio}
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-gray-100 mt-5">
-                  <div className="flex flex-wrap gap-1.5">
-                    {advisor.specialties.map((spec) => (
-                      <span
-                        key={spec}
-                        className="text-[10px] font-semibold bg-gray-50 text-gray-600 px-2 py-0.5 rounded-md border border-gray-100"
-                      >
-                        {spec}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Future Roadmap & Biohacking Frontier (PRD Section 5) */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50/70 border-t border-gray-100">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-14">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs font-semibold mb-4">

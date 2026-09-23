@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Save, Camera, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { profileSchema } from '@/constants/validationRules';
+import { ROLE_LABELS } from '@/constants/roles';
 import { getInitials } from '@/utils/helpers';
 import { toast } from 'sonner';
 import type { z } from 'zod';
@@ -15,20 +16,34 @@ const Profile: React.FC = () => {
   const { user, updateUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors, isDirty } } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       firstName: user?.firstName || '',
       lastName: user?.lastName || '',
       email: user?.email || '',
       phone: user?.phone || '',
+      bio: user?.bio || '',
+      dateOfBirth: user?.dateOfBirth || '',
+      gender: user?.gender || '',
+      city: user?.city || '',
+      country: user?.country || '',
     },
   });
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    await new Promise(r => setTimeout(r, 800));
-    updateUser({ firstName: data.firstName, lastName: data.lastName, phone: data.phone });
+    await new Promise(r => setTimeout(r, 400));
+    updateUser({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phone: data.phone,
+      bio: data.bio,
+      dateOfBirth: data.dateOfBirth,
+      gender: data.gender,
+      city: data.city,
+      country: data.country,
+    });
     toast.success('Profile updated successfully!');
     setIsLoading(false);
   };
@@ -47,7 +62,9 @@ const Profile: React.FC = () => {
         </div>
         <h2 className="text-xl font-bold text-gray-900">{user?.firstName} {user?.lastName}</h2>
         <p className="text-gray-500 text-sm">{user?.email}</p>
-        <span className="inline-block mt-2 px-3 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">Individual User</span>
+        <span className="inline-block mt-2 px-3 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
+          {user?.role ? ROLE_LABELS[user.role] : 'Individual User'}
+        </span>
       </div>
 
       {/* Form */}

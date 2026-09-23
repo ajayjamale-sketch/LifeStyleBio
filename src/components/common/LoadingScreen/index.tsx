@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { APP_LOGO_URL } from '@/constants/appConstants';
+import { BrandLogo } from '@/components/common/BrandLogo';
 
 const LoadingScreen: React.FC = () => {
   return (
@@ -11,7 +11,7 @@ const LoadingScreen: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="flex flex-col items-center gap-6"
       >
-        <img src={APP_LOGO_URL} alt="LifestyleBio" className="h-16 w-auto" />
+        <BrandLogo variant="light" className="h-14 sm:h-16 w-auto" />
         <div className="flex gap-2">
           {[0, 1, 2].map((i) => (
             <motion.div

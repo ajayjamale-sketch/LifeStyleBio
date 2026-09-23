@@ -1,8 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, Shield, Eye, Palette, Globe, Trash2, AlertTriangle } from 'lucide-react';
+import { Bell, Shield, Eye, Trash2, AlertTriangle, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
+
+const MEMBER_SETTINGS_KEY = 'lifestylebio_member_settings';
+
+const DEFAULT_SETTINGS = {
+  emailNotifs: true, pushNotifs: true, smsNotifs: false,
+  healthAlerts: true, weeklyReports: true,
+  profilePublic: false, shareActivity: false,
+  twoFactor: false, loginAlerts: true,
+};
 
 const Toggle: React.FC<{ checked: boolean; onChange: (v: boolean) => void }> = ({ checked, onChange }) => (
   <button
@@ -15,16 +24,27 @@ const Toggle: React.FC<{ checked: boolean; onChange: (v: boolean) => void }> = (
 
 const Settings: React.FC = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [settings, setSettings] = useState({
-    emailNotifs: true, pushNotifs: true, smsNotifs: false,
-    healthAlerts: true, weeklyReports: true,
-    profilePublic: false, shareActivity: false,
-    twoFactor: false, loginAlerts: true,
+  const [settings, setSettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem(MEMBER_SETTINGS_KEY);
+      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
+    } catch {
+      return DEFAULT_SETTINGS;
+    }
   });
 
+  useEffect(() => {
+    localStorage.setItem(MEMBER_SETTINGS_KEY, JSON.stringify(settings));
+  }, [settings]);
+
   const toggle = (key: keyof typeof settings) => {
-    setSettings(p => ({ ...p, [key]: !p[key] }));
+    setSettings((p: typeof DEFAULT_SETTINGS) => ({ ...p, [key]: !p[key] }));
     toast.success('Setting updated successfully!');
+  };
+
+  const handleResetDefaults = () => {
+    setSettings(DEFAULT_SETTINGS);
+    toast.info('Preferences restored to defaults.');
   };
 
   const sections = [
@@ -56,6 +76,18 @@ const Settings: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Account Preferences</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Manage your notifications, privacy controls, and security settings</p>
+        </div>
+        <button
+          onClick={handleResetDefaults}
+          className="btn-outline text-xs py-2 px-3 flex items-center gap-1.5"
+        >
+          <RotateCcw size={13} /> Reset Defaults
+        </button>
+      </div>
       {sections.map(section => (
         <motion.div key={section.title} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
           <div className="flex items-center gap-3 mb-4">

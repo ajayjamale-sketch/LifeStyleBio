@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { APP_LOGO_URL } from '@/constants/appConstants';
+import { BrandLogo } from '@/components/common/BrandLogo';
 import { ROUTES, getRoleDashboard } from '@/constants/routes';
 
 const navLinks = [
@@ -37,8 +37,8 @@ const Navbar: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to={ROUTES.HOME} className="flex-shrink-0">
-            <img src={APP_LOGO_URL} alt="LifestyleBio" className="h-10 sm:h-12 w-auto object-contain" />
+          <Link to={ROUTES.HOME} className="flex-shrink-0 inline-flex items-center">
+            <BrandLogo variant="light" className="h-9 sm:h-11 w-auto" />
           </Link>
 
           {/* Desktop Nav */}

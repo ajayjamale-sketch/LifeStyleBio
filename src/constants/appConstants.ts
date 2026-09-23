@@ -26,6 +26,7 @@ export const SOCIAL_LINKS = {
 } as const;
 
 export const APP_NAME = 'LifestyleBio';
-export const APP_LOGO_URL = '/logo.svg';
-export const APP_LOGO_ICON_URL = '/logo-icon.svg';
+export const APP_LOGO_URL = `${import.meta.env.BASE_URL}logo.svg`;
+export const APP_LOGO_ICON_URL = `${import.meta.env.BASE_URL}logo-icon.svg`;
 export const APP_DESCRIPTION = 'AI-powered personalized health platform';
+

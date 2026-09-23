@@ -15,16 +15,30 @@ const Toggle: React.FC<{ checked: boolean; onChange: () => void; label: string; 
   </div>
 );
 
+const STORAGE_KEY = 'lifestylebio_admin_security_settings';
+const DEFAULT_SETTINGS = {
+  enforce2FA: false, ipWhitelist: false,
+  sessionTimeout: true, failedLoginLock: true,
+  encryptionAtRest: true, auditLogging: true,
+  ddosProtection: true, rateLimit: true,
+};
+
 const Security: React.FC = () => {
-  const [settings, setSettings] = useState({
-    enforce2FA: false, ipWhitelist: false,
-    sessionTimeout: true, failedLoginLock: true,
-    encryptionAtRest: true, auditLogging: true,
-    ddosProtection: true, rateLimit: true,
+  const [settings, setSettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
+    } catch {
+      return DEFAULT_SETTINGS;
+    }
   });
 
   const toggle = (k: keyof typeof settings) => {
-    setSettings(p => ({ ...p, [k]: !p[k] }));
+    setSettings((p: typeof DEFAULT_SETTINGS) => {
+      const next = { ...p, [k]: !p[k] };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
     toast.success('Security setting updated.');
   };
 

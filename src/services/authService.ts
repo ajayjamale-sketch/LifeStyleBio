@@ -16,12 +16,28 @@ export const authService = {
     return users.find(u => u.email.toLowerCase() === email.toLowerCase());
   },
 
+  createUser: (data: Omit<User, 'id' | 'createdAt'>): User => {
+    const users = authService.getAllUsers();
+    const newUser: User = {
+      ...data,
+      id: `user_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    users.unshift(newUser);
+    localStorage.setItem(STORAGE_KEYS.ALL_USERS, JSON.stringify(users));
+    return newUser;
+  },
+
   updateUser: (id: string, updates: Partial<User>): User | null => {
     const users = authService.getAllUsers();
     const index = users.findIndex(u => u.id === id);
     if (index === -1) return null;
     users[index] = { ...users[index], ...updates };
     localStorage.setItem(STORAGE_KEYS.ALL_USERS, JSON.stringify(users));
+    const current = authService.getCurrentUser();
+    if (current && current.id === id) {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(users[index]));
+    }
     return users[index];
   },
 

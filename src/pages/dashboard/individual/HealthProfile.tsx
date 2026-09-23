@@ -12,17 +12,34 @@ import type { z } from 'zod';
 
 type FormData = z.infer<typeof healthProfileSchema>;
 
+const STORAGE_KEY = 'lifestylebio_member_health_profile';
+const DEFAULT_HEALTH_PROFILE: FormData = {
+  height: 170,
+  weight: 70,
+  bloodType: 'O+',
+  fitnessLevel: 'moderately_active',
+  smokingStatus: 'never',
+  alcoholConsumption: 'occasional',
+  sleepHours: 8,
+  stressLevel: 5,
+};
+
 const HealthProfile: React.FC = () => {
   const { user } = useAuth();
-  const [saved, setSaved] = useState(false);
+  const storageKey = `${STORAGE_KEY}_${user?.id || 'default'}`;
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
+  const getSavedProfile = (): FormData => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? { ...DEFAULT_HEALTH_PROFILE, ...JSON.parse(saved) } : DEFAULT_HEALTH_PROFILE;
+    } catch {
+      return DEFAULT_HEALTH_PROFILE;
+    }
+  };
+
+  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(healthProfileSchema),
-    defaultValues: {
-      height: 170, weight: 70, fitnessLevel: 'moderately_active',
-      smokingStatus: 'never', alcoholConsumption: 'occasional',
-      sleepHours: 8, stressLevel: 5,
-    },
+    defaultValues: getSavedProfile(),
   });
 
   const height = watch('height');
@@ -31,10 +48,14 @@ const HealthProfile: React.FC = () => {
   const bmiInfo = bmi ? getBMICategory(bmi) : null;
 
   const onSubmit = async (data: FormData) => {
-    await new Promise(r => setTimeout(r, 600));
-    console.log('Health profile saved:', data);
-    toast.success('Health profile updated successfully!');
-    setSaved(true);
+    localStorage.setItem(storageKey, JSON.stringify(data));
+    toast.success('Health profile saved to your record!');
+  };
+
+  const handleReset = () => {
+    localStorage.removeItem(storageKey);
+    reset(DEFAULT_HEALTH_PROFILE);
+    toast.info('Health profile reset to default baseline.');
   };
 
   return (
@@ -138,9 +159,14 @@ const HealthProfile: React.FC = () => {
           </div>
         </div>
 
-        <button type="submit" className="btn-primary flex items-center gap-2">
-          <Save size={16} /> Save Health Profile
-        </button>
+        <div className="flex items-center gap-3">
+          <button type="submit" className="btn-primary flex items-center gap-2 cursor-pointer">
+            <Save size={16} /> Save Health Profile
+          </button>
+          <button type="button" onClick={handleReset} className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer">
+            Reset Baseline
+          </button>
+        </div>
       </form>
     </div>
   );

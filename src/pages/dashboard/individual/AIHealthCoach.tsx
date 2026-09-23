@@ -1,26 +1,37 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, User, Lightbulb, RefreshCw } from 'lucide-react';
+import { Send, Bot, User, Lightbulb, RefreshCw, Trash2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { aiService, type AIMessage } from '@/services/aiService';
 import { generateId } from '@/utils/helpers';
+import { toast } from 'sonner';
+
+const AI_CHAT_STORAGE_KEY = 'lifestylebio_member_ai_chat';
 
 const AIHealthCoach: React.FC = () => {
   const { user } = useAuth();
-  const [messages, setMessages] = useState<AIMessage[]>([
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content: `Hello ${user?.firstName || 'there'}! I'm your AI Health Coach. I'm here to provide personalized guidance based on your health data. Ask me anything about nutrition, fitness, sleep, mental wellness, or preventive health. How can I help you today?`,
-      timestamp: new Date().toISOString(),
+  const defaultWelcome: AIMessage = {
+    id: 'welcome',
+    role: 'assistant',
+    content: `Hello ${user?.firstName || 'there'}! I'm your AI Health Coach. I'm here to provide personalized guidance based on your health data. Ask me anything about nutrition, fitness, sleep, mental wellness, or preventive health. How can I help you today?`,
+    timestamp: new Date().toISOString(),
+  };
+
+  const [messages, setMessages] = useState<AIMessage[]>(() => {
+    try {
+      const saved = localStorage.getItem(AI_CHAT_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [defaultWelcome];
+    } catch {
+      return [defaultWelcome];
     }
-  ]);
+  });
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const prompts = aiService.getQuickPrompts();
 
   useEffect(() => {
+    localStorage.setItem(AI_CHAT_STORAGE_KEY, JSON.stringify(messages));
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
@@ -34,6 +45,22 @@ const AIHealthCoach: React.FC = () => {
     const aiMsg: AIMessage = { id: generateId(), role: 'assistant', content: response, timestamp: new Date().toISOString() };
     setMessages(prev => [...prev, aiMsg]);
     setIsTyping(false);
+  };
+
+  const handleDeleteMessage = (id: string) => {
+    setMessages(prev => prev.filter(m => m.id !== id));
+    toast.info('Message deleted.');
+  };
+
+  const handleNewChat = () => {
+    const resetMsg: AIMessage = {
+      id: generateId(),
+      role: 'assistant',
+      content: 'Starting a new session. How can I help you today?',
+      timestamp: new Date().toISOString(),
+    };
+    setMessages([resetMsg]);
+    toast.success('Chat history cleared.');
   };
 
   return (
@@ -52,7 +79,7 @@ const AIHealthCoach: React.FC = () => {
             </div>
           </div>
         </div>
-        <button onClick={() => setMessages([{ id: 'welcome', role: 'assistant', content: 'Starting a new session. How can I help you today?', timestamp: new Date().toISOString() }])} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
+        <button onClick={handleNewChat} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
           <RefreshCw size={14} /> New Chat
         </button>
       </div>
@@ -65,20 +92,29 @@ const AIHealthCoach: React.FC = () => {
               key={msg.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex gap-3 group items-start ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {msg.role === 'assistant' && (
                 <div className="w-8 h-8 bg-gradient-brand rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Bot size={16} className="text-white" />
                 </div>
               )}
-              <div className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+              <div className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed relative ${
                 msg.role === 'user'
                   ? 'bg-emerald-500 text-white rounded-tr-sm'
                   : 'bg-gray-50 text-gray-800 rounded-tl-sm border border-gray-100'
               }`}>
                 {msg.content}
               </div>
+              {messages.length > 1 && (
+                <button
+                  onClick={() => handleDeleteMessage(msg.id)}
+                  className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-300 hover:text-red-500 transition-opacity mt-1"
+                  title="Delete message"
+                >
+                  <Trash2 size={13} />
+                </button>
+              )}
               {msg.role === 'user' && (
                 <div className="w-8 h-8 bg-sky-100 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
                   <User size={16} className="text-sky-600" />

@@ -9,7 +9,7 @@ import {
   HeartPulse, UserCheck,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { APP_LOGO_URL, APP_LOGO_ICON_URL } from '@/constants/appConstants';
+import { BrandLogo } from '@/components/common/BrandLogo';
 import { ROUTES } from '@/constants/routes';
 import type { SidebarItem } from '@/types/common.types';
 
@@ -112,10 +112,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, isCollapsed, onClose, onToggl
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className={`flex items-center gap-3 px-4 py-5 border-b border-gray-100 ${isCollapsed ? 'justify-center px-2' : ''}`}>
-        <img
-          src={isCollapsed ? APP_LOGO_ICON_URL : APP_LOGO_URL}
-          alt="LifestyleBio"
-          className={`${isCollapsed ? 'h-8 w-8' : 'h-10 w-auto'} transition-all object-contain`}
+        <BrandLogo
+          iconOnly={isCollapsed}
+          variant="light"
+          className={`${isCollapsed ? 'h-8 w-8' : 'h-9 w-auto'} transition-all`}
         />
         {!isCollapsed && (
           <button

@@ -3,10 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, ShieldCheck, Sparkles } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { loginSchema } from '@/constants/validationRules';
 import { ROUTES } from '@/constants/routes';
+import { ADMIN_EMAIL, ADMIN_PASSWORD } from '@/constants/roles';
 import Captcha from '@/components/common/Captcha';
 import { toast } from 'sonner';
 import type { z } from 'zod';
@@ -20,9 +21,15 @@ const AdminLogin: React.FC = () => {
   const { adminLogin } = useAuth();
   const navigate = useNavigate();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(loginSchema),
   });
+
+  const handleFillAdminCredentials = () => {
+    setValue('email', ADMIN_EMAIL, { shouldValidate: true });
+    setValue('password', ADMIN_PASSWORD, { shouldValidate: true });
+    toast.info('Admin demo credentials loaded');
+  };
 
   const onSubmit = async (data: FormData) => {
     if (!captchaVerified) { toast.error('Please complete the security check.'); return; }
@@ -44,9 +51,24 @@ const AdminLogin: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-6">
+      <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-4">
         <p className="text-amber-800 text-sm font-medium">Restricted Access</p>
         <p className="text-amber-600 text-xs mt-0.5">This page is for system administrators only. All access attempts are logged and monitored.</p>
+      </div>
+
+      <div className="mb-5 p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center justify-between gap-3">
+        <span className="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+          <Sparkles size={14} className="text-orange-500 shrink-0" />
+          Quick Demo Access
+        </span>
+        <button
+          type="button"
+          onClick={handleFillAdminCredentials}
+          className="px-3 py-1.5 bg-gradient-to-r from-red-500 to-orange-500 hover:opacity-90 text-white text-xs font-bold rounded-lg shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+        >
+          <ShieldCheck size={13} />
+          Fill Admin Credentials
+        </button>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">

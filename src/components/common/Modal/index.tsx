@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
@@ -9,6 +10,7 @@ interface ModalProps {
   subtitle?: string;
   children: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }
 
 const maxWidthMap = {
@@ -19,14 +21,17 @@ const maxWidthMap = {
   '2xl': 'max-w-2xl',
 };
 
-const Modal: React.FC<ModalProps> = ({
+export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   title,
   subtitle,
   children,
-  maxWidth = 'md',
+  maxWidth,
+  size,
 }) => {
+  const resolvedSize = maxWidth || size || 'md';
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -41,15 +46,15 @@ const Modal: React.FC<ModalProps> = ({
     };
   }, [isOpen, onClose]);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 !m-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+            className="fixed inset-0 !m-0 bg-slate-900/60 backdrop-blur-sm"
             onClick={onClose}
           />
           <motion.div
@@ -57,7 +62,7 @@ const Modal: React.FC<ModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 15 }}
             transition={{ type: 'spring', duration: 0.3 }}
-            className={`relative bg-white rounded-2xl shadow-2xl w-full ${maxWidthMap[maxWidth]} p-6 my-8 z-10 border border-slate-100 max-h-[90vh] flex flex-col`}
+            className={`relative bg-white rounded-2xl shadow-2xl w-full ${maxWidthMap[resolvedSize]} p-6 my-8 z-10 border border-slate-100 max-h-[90vh] flex flex-col`}
           >
             {/* Header */}
             <div className="flex items-start justify-between pb-4 border-b border-slate-100">
@@ -81,7 +86,8 @@ const Modal: React.FC<ModalProps> = ({
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

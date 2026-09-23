@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { APP_LOGO_URL } from '@/constants/appConstants';
+import { BrandLogo } from '@/components/common/BrandLogo';
 import { ROUTES } from '@/constants/routes';
 import { ShieldCheck, Lock, ArrowLeft, Sparkles } from 'lucide-react';
 
@@ -20,11 +20,7 @@ const AuthLayout: React.FC = () => {
         {/* Top Header / Logo */}
         <div className="relative z-10 flex items-center justify-between">
           <Link to={ROUTES.HOME} className="inline-block group">
-            <img 
-              src={APP_LOGO_URL} 
-              alt="LifestyleBio" 
-              className="h-9 xl:h-10 w-auto brightness-0 invert opacity-95 group-hover:opacity-100 transition-opacity" 
-            />
+            <BrandLogo variant="dark" className="h-9 xl:h-10 w-auto opacity-95 group-hover:opacity-100 transition-opacity" />
           </Link>
           <Link 
             to={ROUTES.HOME}
@@ -106,7 +102,7 @@ const AuthLayout: React.FC = () => {
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="lg:hidden flex items-center justify-between pb-2 border-b border-slate-200 shrink-0">
           <Link to={ROUTES.HOME}>
-            <img src={APP_LOGO_URL} alt="LifestyleBio" className="h-8 w-auto" />
+            <BrandLogo variant="light" className="h-8 w-auto" />
           </Link>
           <Link to={ROUTES.HOME} className="text-xs font-bold text-slate-600 hover:text-emerald-600 flex items-center gap-1">
             <ArrowLeft size={13} /> Home
