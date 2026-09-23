@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Watch, FileText, Activity, Bot, ChevronRight, CheckCircle2, 
-  Sparkles, Heart, Apple, Moon, Brain, Shield, ArrowUpRight
+  Sparkles, Heart, Apple, Moon, Brain, Shield, ArrowUpRight, Zap
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/constants/routes';
